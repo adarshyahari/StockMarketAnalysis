@@ -156,7 +156,7 @@ if module_select == 'Tracker Overview':
         plt.title('Segment Composition', weight="bold")
         my_circle = plt.Circle((0, 0), 0.7, color='white')
         colors = ("#CBF2B8", "#FFA1CA", "#AA98F0",
-                  '#FDF8AF', '#F5C1C1', '#A6EDFF')
+                  '#FDF8AF', '#F5C1C1', '#A6EDFF', '#ffdca9')
         p = plt.gcf()
         p.gca().add_artist(my_circle)
         plt.pie(size, labels=names, colors=colors)
@@ -256,112 +256,131 @@ elif module_select == 'Stock specific':
                     stkone = get_data(stocks[i], onemo, end)
 
                     pe_data = web.get_quote_yahoo(stocks[i])['trailingPE']
+                    mc_data = web.get_quote_yahoo(stocks[i])['marketCap']
 
                     tickers = ['Adj Close', 'Open', 'High', 'Low']
-                    col1, col2, col3, col4, col5 = st.columns(5)
+                    col1, col2, col3, col4 = st.columns(4)
                     tickercol = [col1, col2, col3, col4]
                     for t in range(4):
                         l = stk[tickers[t]][-1]
                         f = stk[tickers[t]][-2]
                         inc = l-f
                         iper = inc/f * 100
-                        tickercol[t].metric(tickers[t], "{}".format(
+                        tickercol[t].metric(tickers[t], "₹{}".format(
                             round(l, 2)), "{}%".format(round(iper, 2)))
-                    col5.metric("PE Ratio", "{}".format(
+                    col1, col2 = st.columns(2)
+                    col1.metric("PE Ratio", "{}".format(
                         round(float(pe_data), 2)))
+                    col2.metric("Market Cap", "{}LCr".format(
+                        round(float(mc_data/10000000), 2)))
 
-                    # Adjusted Closing price
-                    st.subheader('Adjusted Closing Price')
-                    col1, col2, col3, col4, d1, d2, d3, d4 = st.columns(8)
-                    with col1:
-                        b1 = st.button('1Y')
-                    with col2:
-                        b2 = st.button('6M')
-                    with col3:
-                        b3 = st.button('1M')
-                    with col4:
-                        b4 = st.button('5D')
+                    # # Adjusted Closing price
+                    # st.subheader('Adjusted Closing Price')
+                    # col1, col2, col3, col4, d1, d2, d3, d4 = st.columns(8)
+                    # with col1:
+                    #     b1 = st.button('1Y')
+                    # with col2:
+                    #     b2 = st.button('6M')
+                    # with col3:
+                    #     b3 = st.button('1M')
+                    # with col4:
+                    #     b4 = st.button('5D')
 
-                    adjclose = pd.DataFrame(stk['Adj Close'])
-                    adjsix = pd.DataFrame(stk['Adj Close'].tail(length))
+                    # adjclose = pd.DataFrame(stk['Adj Close'])
+                    # adjsix = pd.DataFrame(stk['Adj Close'].tail(int(length/2)))
 
-                    if b1:
-                        adjclose.plot()
-                        st.pyplot()
-                    elif b2:
-                        adjsix.plot()
-                        st.pyplot()
-                    elif b3:
-                        adjone = pd.DataFrame(stkone['Adj Close'])
-                        adjone.plot()
-                        st.pyplot()
-                    elif b4:
-                        adjfive = pd.DataFrame(stkone['Adj Close'].tail(5))
-                        adjfive.plot()
-                        st.pyplot()
+                    # if b1:
+                    #     st.area_chart(adjclose)
+                    # elif b2:
+                    #     st.area_chart(adjsix)
+                    # elif b3:
+                    #     adjone = pd.DataFrame(stkone['Adj Close'])
+                    #     st.area_chart(adjone)
+                    # elif b4:
+                    #     adjfive = pd.DataFrame(stkone['Adj Close'].tail(5))
+                    #     st.area_chart(adjfive)
 
-                    # Moving average of stock for 10,20,50 days
-                    st.subheader('Moving average of stock')
-                    ma_day = [10, 20, 50]
-                    for ma in ma_day:
-                        column_name = "MA for %s days" % (str(ma))
-                        stk[column_name] = adjclose.rolling(
-                            window=ma, center=False).mean()
-                    plt.figure(figsize=(2, 3))
-                    stk[['Adj Close', 'MA for 10 days',
-                         'MA for 20 days', 'MA for 50 days']].plot()
-                    st.pyplot()
+                    # # Moving average of stock for 10,20,50 days
+                    # st.subheader('Moving average of stock')
+                    # ma_day = [10, 20, 50]
+                    # for ma in ma_day:
+                    #     column_name = "MA for %s days" % (str(ma))
+                    #     stk[column_name] = adjclose.rolling(
+                    #         window=ma, center=False).mean()
+                    # plt.figure(figsize=(2, 3))
+                    # st.line_chart(stk[['Adj Close', 'MA for 10 days',
+                    #                    'MA for 20 days', 'MA for 50 days']])
 
-                    # Daily return of stock in %
-                    st.subheader('Daily Return')
-                    dlrt = adjclose.pct_change()
-                    st.metric('Daily Return Average', "{}%".format(
-                        round(float(dlrt.mean())*100, 2)))
-                    st.line_chart(dlrt, width=800, height=400,
-                                  use_container_width=False)
+                    # # Daily return of stock in %
+                    # st.subheader('Daily Return')
+                    # dlrt = adjclose.pct_change()
+                    # st.metric('Daily Return Average', "{}%".format(
+                    #     round(float(dlrt.mean())*100, 2)))
+                    # st.line_chart(dlrt, width=800, height=400,
+                    #               use_container_width=False)
 
-                    # Daily return in histogram with KDE
-                    sns.distplot(dlrt.dropna(), bins=300, color='red')
-                    st.pyplot()
+                    # # Daily return in histogram with KDE
+                    # plt.figure(figsize=(8, 3))
+                    # sns.distplot(dlrt.dropna(), bins=300, color='red')
+                    # st.pyplot()
 
-                    # Monte Carlo Function
-                    days = 365
-                    dt = 1/365
-                    mu = dlrt.mean()
-                    sigma = dlrt.std()
+                    # # Monte Carlo Function
+                    # days = 365
+                    # dt = 1/365
+                    # mu = dlrt.mean()
+                    # sigma = dlrt.std()
 
-                    def stock_monte_carlo(start_price, days, mu, sigma):
-                        price = np.zeros(days)
-                        price[0] = start_price
-                        shock = np.zeros(days)
-                        drift = np.zeros(days)
-                        for x in range(1, days):
-                            shock[x] = np.random.normal(
-                                loc=mu*dt, scale=sigma*np.sqrt(dt))
-                            drift[x] = mu * dt
-                            price[x] = price[x-1] + \
-                                (price[x-1] * (drift[x]+shock[x]))
-                        return price
-                    start_price = stk['Open'].head()[0]
+                    # def stock_monte_carlo(start_price, days, mu, sigma):
+                    #     price = np.zeros(days)
+                    #     price[0] = start_price
+                    #     shock = np.zeros(days)
+                    #     drift = np.zeros(days)
+                    #     for x in range(1, days):
+                    #         shock[x] = np.random.normal(
+                    #             loc=mu*dt, scale=sigma*np.sqrt(dt))
+                    #         drift[x] = mu * dt
+                    #         price[x] = price[x-1] + \
+                    #             (price[x-1] * (drift[x]+shock[x]))
+                    #     return price
 
-                    # Value at Risk
-                    st.subheader('Value at Risk')
-                    simulations, q = value_risk()
-                    st.caption('If you invested {} exactly one year ago, the maximum loss you would have incurred in a year is {}'.format(
-                        start_price, round(start_price-q, 2)))
-                    col1, col2, col3, col4 = st.columns(4)
-                    col1.metric('Start Price', '₹{}'.format(start_price))
-                    col2.metric('Mean Final Price', '₹{}'.format(
-                        round(simulations.mean(), 2)))
-                    col4.metric('Lossy Final Price', '₹{}'.format(round(q, 2)))
-                    col3.metric('Value at risk', '₹{}'.format(
-                        round(start_price-q, 2)))
+                    # start_price = stk['Open'].head()[0]
 
-                    plt.figure(figsize=(16, 7))
-                    plt.hist(simulations, bins=200)
-                    plt.figtext(0.15, 0.6, "q(0.99): Rs%.2f" % q)
-                    plt.axvline(x=q, linewidth=4, color='r')
-                    st.pyplot()
+                    # monte = st.checkbox(
+                    #     "Show Monte Carlo Analysis for 100 runs")
+                    # if monte:
+                    #     # Visualize using scatter plot in matplotlib
+                    #     plt.figure(figsize=(12, 7))
+                    #     plt.xlabel('Days')
+                    #     plt.ylabel('Price')
+                    #     plt.title('Monte Carlo Analysis for {}'.format(stocknames[i]),
+                    #               weight="bold")
+
+                    #     for run in range(100):
+                    #         plt.plot(stock_monte_carlo(
+                    #             start_price, days, mu, sigma))
+                    #     st.pyplot()
+
+                    # # Value at Risk
+                    # st.subheader('Value at Risk')
+                    # simulations, q = value_risk()
+                    # st.caption('If you invested {} exactly one year ago, the maximum loss you would have incurred in a year is {}'.format(
+                    #     round(start_price, 2), round(start_price-q, 2)))
+                    # col1, col2, col3, col4 = st.columns(4)
+                    # col1.metric('Start Price', '₹{}'.format(
+                    #     round(start_price, 2)))
+                    # col2.metric('Mean Final Price', '₹{}'.format(
+                    #     round(simulations.mean(), 2)))
+                    # col4.metric('Lossy Final Price', '₹{}'.format(round(q, 2)))
+                    # col3.metric('Value at risk', '₹{}'.format(
+                    #     round(start_price-q, 2)))
+
+                    # plt.figure(figsize=(16, 7))
+                    # plt.hist(simulations, bins=200)
+                    # plt.figtext(0.15, 0.6, "q(0.99): Rs%.2f" % q)
+                    # plt.axvline(x=q, linewidth=4, color='r')
+                    # st.pyplot()
+
+                    st.balloons()
 
                 except Exception as e:
                     st.write(e)
@@ -441,6 +460,28 @@ elif module_select == 'Optimized Portfolios':
         portfolio_risk = np.array(portfolio_risk)
         portfolio_returns = np.array(portfolio_returns)
         sharpe_ratio_port = np.array(sharpe_ratio_port)
+
+        agree = st.checkbox("Show generated portfolio scatterplot")
+        if agree:
+            # Visualize using scatter plot in matplotlib
+            plt.figure(figsize=(12, 7))
+            plt.scatter(portfolio_risk, portfolio_returns,
+                        c=portfolio_returns / portfolio_risk)
+            plt.xlabel('volatility')
+            plt.ylabel('returns')
+            plt.colorbar(label='Sharpe ratio')
+            plt.title('Sharpe Ratio for random portfolios', weight="bold")
+            st.pyplot()
+
+            source = pd.DataFrame({
+                'Risk': portfolio_risk,
+                'Return': portfolio_returns
+            })
+            alt.Chart(source).mark_circle(size=60).encode(
+                x='Risk',
+                y='Return',
+                tooltip=['Risk', 'Return']
+            ).interactive()
 
         # We consider the metrics: return, risk, sharpe ratio, and weights
         porfolio_metrics = [portfolio_returns, portfolio_risk,
