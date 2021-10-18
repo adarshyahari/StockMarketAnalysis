@@ -268,117 +268,127 @@ elif module_select == 'Stock specific':
                         iper = inc/f * 100
                         tickercol[t].metric(tickers[t], "₹{}".format(
                             round(l, 2)), "{}%".format(round(iper, 2)))
-                    col1, col2 = st.columns(2)
                     col1.metric("PE Ratio", "{}".format(
                         round(float(pe_data), 2)))
                     col2.metric("Market Cap", "{}LCr".format(
-                        round(float(mc_data/10000000), 2)))
+                        round(float(mc_data/1000000000000), 2)))
+                    col3.metric('52-week High',
+                                '₹{}'.format(round(stk['High'].max(), 2)))
+                    col4.metric('52-week Low',
+                                '₹{}'.format(round(stk['Low'].min(), 2)))
 
-                    # # Adjusted Closing price
-                    # st.subheader('Adjusted Closing Price')
-                    # col1, col2, col3, col4, d1, d2, d3, d4 = st.columns(8)
-                    # with col1:
-                    #     b1 = st.button('1Y')
-                    # with col2:
-                    #     b2 = st.button('6M')
-                    # with col3:
-                    #     b3 = st.button('1M')
-                    # with col4:
-                    #     b4 = st.button('5D')
+                    # Adjusted Closing price
+                    st.subheader('Adjusted Closing Price')
+                    col1, col2, col3, col4, d1, d2, d3, d4, d5, d6, d7, d8 = st.columns(
+                        12)
+                    with col1:
+                        b1 = st.button('1Y')
+                    with col2:
+                        b2 = st.button('6M')
+                    with col3:
+                        b3 = st.button('1M')
+                    with col4:
+                        b4 = st.button('5D')
 
-                    # adjclose = pd.DataFrame(stk['Adj Close'])
-                    # adjsix = pd.DataFrame(stk['Adj Close'].tail(int(length/2)))
+                    adjclose = pd.DataFrame(stk['Adj Close'])
+                    adjsix = pd.DataFrame(stk['Adj Close'].tail(int(length/2)))
 
-                    # if b1:
-                    #     st.area_chart(adjclose)
-                    # elif b2:
-                    #     st.area_chart(adjsix)
-                    # elif b3:
-                    #     adjone = pd.DataFrame(stkone['Adj Close'])
-                    #     st.area_chart(adjone)
-                    # elif b4:
-                    #     adjfive = pd.DataFrame(stkone['Adj Close'].tail(5))
-                    #     st.area_chart(adjfive)
+                    if b1:
+                        st.area_chart(adjclose, width=800, height=400,
+                                      use_container_width=False)
+                    elif b2:
+                        st.area_chart(adjsix, width=800, height=400,
+                                      use_container_width=False)
+                    elif b3:
+                        adjone = pd.DataFrame(stkone['Adj Close'])
+                        st.area_chart(adjone, width=800, height=400,
+                                      use_container_width=False)
+                    elif b4:
+                        adjfive = pd.DataFrame(stkone['Adj Close'].tail(5))
+                        st.area_chart(adjfive, width=800, height=400,
+                                      use_container_width=False)
 
-                    # # Moving average of stock for 10,20,50 days
-                    # st.subheader('Moving average of stock')
-                    # ma_day = [10, 20, 50]
-                    # for ma in ma_day:
-                    #     column_name = "MA for %s days" % (str(ma))
-                    #     stk[column_name] = adjclose.rolling(
-                    #         window=ma, center=False).mean()
-                    # plt.figure(figsize=(2, 3))
-                    # st.line_chart(stk[['Adj Close', 'MA for 10 days',
-                    #                    'MA for 20 days', 'MA for 50 days']])
+                    # Moving average of stock for 10,20,50 days
+                    st.subheader('Moving average of stock')
+                    ma_day = [10, 20, 50]
+                    for ma in ma_day:
+                        column_name = "MA for %s days" % (str(ma))
+                        stk[column_name] = adjclose.rolling(
+                            window=ma, center=False).mean()
+                    plt.figure(figsize=(2, 3))
+                    st.line_chart(stk[['Adj Close', 'MA for 10 days',
+                                       'MA for 20 days', 'MA for 50 days']], width=800, height=400,
+                                  use_container_width=False)
 
-                    # # Daily return of stock in %
-                    # st.subheader('Daily Return')
-                    # dlrt = adjclose.pct_change()
-                    # st.metric('Daily Return Average', "{}%".format(
-                    #     round(float(dlrt.mean())*100, 2)))
-                    # st.line_chart(dlrt, width=800, height=400,
-                    #               use_container_width=False)
+                    # Daily return of stock in %
+                    st.subheader('Daily Return')
+                    dlrt = adjclose.pct_change()
+                    st.metric('Daily Return Average', "{}%".format(
+                        round(float(dlrt.mean())*100, 2)))
+                    st.line_chart(dlrt, width=800, height=400,
+                                  use_container_width=False)
 
-                    # # Daily return in histogram with KDE
-                    # plt.figure(figsize=(8, 3))
-                    # sns.distplot(dlrt.dropna(), bins=300, color='red')
-                    # st.pyplot()
+                    # Daily return in histogram with KDE
+                    plt.figure(figsize=(8, 3))
+                    sns.distplot(dlrt.dropna(), bins=300, color='red')
+                    st.pyplot()
 
-                    # # Monte Carlo Function
-                    # days = 365
-                    # dt = 1/365
-                    # mu = dlrt.mean()
-                    # sigma = dlrt.std()
+                    # Monte Carlo Function
+                    days = 365
+                    dt = 1/365
+                    mu = dlrt.mean()
+                    sigma = dlrt.std()
 
-                    # def stock_monte_carlo(start_price, days, mu, sigma):
-                    #     price = np.zeros(days)
-                    #     price[0] = start_price
-                    #     shock = np.zeros(days)
-                    #     drift = np.zeros(days)
-                    #     for x in range(1, days):
-                    #         shock[x] = np.random.normal(
-                    #             loc=mu*dt, scale=sigma*np.sqrt(dt))
-                    #         drift[x] = mu * dt
-                    #         price[x] = price[x-1] + \
-                    #             (price[x-1] * (drift[x]+shock[x]))
-                    #     return price
+                    def stock_monte_carlo(start_price, days, mu, sigma):
+                        price = np.zeros(days)
+                        price[0] = start_price
+                        shock = np.zeros(days)
+                        drift = np.zeros(days)
+                        for x in range(1, days):
+                            shock[x] = np.random.normal(
+                                loc=mu*dt, scale=sigma*np.sqrt(dt))
+                            drift[x] = mu * dt
+                            price[x] = price[x-1] + \
+                                (price[x-1] * (drift[x]+shock[x]))
+                        return price
 
-                    # start_price = stk['Open'].head()[0]
+                    start_price = stk['Open'].head()[0]
 
-                    # monte = st.checkbox(
-                    #     "Show Monte Carlo Analysis for 100 runs")
-                    # if monte:
-                    #     # Visualize using scatter plot in matplotlib
-                    #     plt.figure(figsize=(12, 7))
-                    #     plt.xlabel('Days')
-                    #     plt.ylabel('Price')
-                    #     plt.title('Monte Carlo Analysis for {}'.format(stocknames[i]),
-                    #               weight="bold")
+                    # Value at Risk
+                    st.subheader('Value at Risk')
 
-                    #     for run in range(100):
-                    #         plt.plot(stock_monte_carlo(
-                    #             start_price, days, mu, sigma))
-                    #     st.pyplot()
+                    monte = st.checkbox(
+                        "Show Monte Carlo Analysis for 100 runs")
+                    if monte:
+                        # Visualize using scatter plot in matplotlib
+                        plt.figure(figsize=(12, 7))
+                        plt.xlabel('Days')
+                        plt.ylabel('Price')
+                        plt.title('Monte Carlo Analysis for {}'.format(stocknames[i]),
+                                  weight="bold")
 
-                    # # Value at Risk
-                    # st.subheader('Value at Risk')
-                    # simulations, q = value_risk()
-                    # st.caption('If you invested {} exactly one year ago, the maximum loss you would have incurred in a year is {}'.format(
-                    #     round(start_price, 2), round(start_price-q, 2)))
-                    # col1, col2, col3, col4 = st.columns(4)
-                    # col1.metric('Start Price', '₹{}'.format(
-                    #     round(start_price, 2)))
-                    # col2.metric('Mean Final Price', '₹{}'.format(
-                    #     round(simulations.mean(), 2)))
-                    # col4.metric('Lossy Final Price', '₹{}'.format(round(q, 2)))
-                    # col3.metric('Value at risk', '₹{}'.format(
-                    #     round(start_price-q, 2)))
+                        for run in range(100):
+                            plt.plot(stock_monte_carlo(
+                                start_price, days, mu, sigma))
+                        st.pyplot()
 
-                    # plt.figure(figsize=(16, 7))
-                    # plt.hist(simulations, bins=200)
-                    # plt.figtext(0.15, 0.6, "q(0.99): Rs%.2f" % q)
-                    # plt.axvline(x=q, linewidth=4, color='r')
-                    # st.pyplot()
+                    simulations, q = value_risk()
+                    st.caption('If you invested ₹{} exactly one year ago, the maximum loss you would have incurred in a year is ₹{}'.format(
+                        round(start_price, 2), round(start_price-q, 2)))
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric('Start Price', '₹{}'.format(
+                        round(start_price, 2)))
+                    col2.metric('Mean Final Price', '₹{}'.format(
+                        round(simulations.mean(), 2)))
+                    col4.metric('Lossy Final Price', '₹{}'.format(round(q, 2)))
+                    col3.metric('Value at risk', '₹{}'.format(
+                        round(start_price-q, 2)))
+
+                    plt.figure(figsize=(16, 7))
+                    plt.hist(simulations, bins=200)
+                    plt.figtext(0.15, 0.6, "q(0.99): Rs%.2f" % q)
+                    plt.axvline(x=q, linewidth=4, color='r')
+                    st.pyplot()
 
                     st.balloons()
 
