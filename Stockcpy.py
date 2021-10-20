@@ -308,6 +308,12 @@ elif module_select == 'Stock specific':
                         st.area_chart(adjfive, width=800, height=400,
                                       use_container_width=False)
 
+                    # Volume Traded
+                    st.subheader('Volume Traded over time')
+                    volume = pd.DataFrame(stk['Volume'])
+                    st.area_chart(volume, width=800, height=400,
+                                  use_container_width=False)
+
                     # Moving average of stock for 10,20,50 days
                     st.subheader('Moving average of stock')
                     ma_day = [10, 20, 50]
@@ -390,7 +396,16 @@ elif module_select == 'Stock specific':
                     plt.axvline(x=q, linewidth=4, color='r')
                     st.pyplot()
 
-                    st.balloons()
+                    # Sentiment Analysis
+                    st.subheader(
+                        'Sentiment Analysis of Stock for 7-day period')
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.image('download (1).png',
+                                 caption='Closing Price of stock', width=None)
+                    with col2:
+                        st.image('download (2).png',
+                                 caption='Sentiment of news on equity', width=None)
 
                 except Exception as e:
                     st.write(e)
