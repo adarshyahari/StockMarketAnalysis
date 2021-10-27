@@ -316,7 +316,7 @@ elif module_select == 'Stock specific':
 
                     # Moving average of stock for 10,20,50 days
                     st.subheader('Moving average of stock')
-                    ma_day = [10, 20, 50]
+                    ma_day = [50, 100, 200]
                     for ma in ma_day:
                         column_name = "MA for %s days" % (str(ma))
                         stk[column_name] = adjclose.rolling(
@@ -379,8 +379,8 @@ elif module_select == 'Stock specific':
                         st.pyplot()
 
                     simulations, q = value_risk()
-                    st.caption('If you invested ₹{} exactly one year ago, the maximum loss you would have incurred in a year is ₹{}'.format(
-                        round(start_price, 2), round(start_price-q, 2)))
+                    st.caption('The red line indicates the value of stock at risk at the desired confidence interval. For every stock, we would be risking ₹{}, 99% of the time '.format(
+                        round(start_price - q, 2)))
                     col1, col2, col3, col4 = st.columns(4)
                     col1.metric('Start Price', '₹{}'.format(
                         round(start_price, 2)))
