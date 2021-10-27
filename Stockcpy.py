@@ -315,14 +315,14 @@ elif module_select == 'Stock specific':
 
                     # Moving average of stock for 10,20,50 days
                     st.subheader('Moving average of stock')
-                    ma_day = [50, 100, 200]
+                    ma_day = [50, 100]
                     for ma in ma_day:
                         column_name = "MA for %s days" % (str(ma))
                         stk[column_name] = adjclose.rolling(
                             window=ma, center=False).mean()
                     plt.figure(figsize=(2, 3))
                     st.line_chart(stk[['Adj Close', 'MA for 50 days',
-                                       'MA for 100 days', 'MA for 200 days']], width=800, height=400,
+                                       'MA for 100 days']], width=800, height=400,
                                   use_container_width=False)
 
                     # Daily return of stock in %
