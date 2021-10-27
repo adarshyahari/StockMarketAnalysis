@@ -15,7 +15,6 @@ import datetime as dt
 # Streamlit imports
 alt.renderers.enable('mimetype')
 alt.renderers.enable('html')
-alt.renderers.enable('altair_viewer')
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Visualisation imports
